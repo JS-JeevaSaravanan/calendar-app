@@ -1,50 +1,152 @@
-# React + TypeScript + Vite
+Here's an updated version of your `README.md` with a cleaner structure, removing the license section, and focusing on the key details for deployment and usage:
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+---
 
-Currently, two official plugins are available:
+# Calendar App with Event Management
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+A **Calendar App** built with **React**, **TypeScript**, and **React Big Calendar**. It allows users to view, create, and manage events, with events stored globally and displayed in various calendar views.
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- **Event Creation**: Select time slots to create events with title, description, and color.
+- **Multiple Views**: Supports Day, Week, and Month calendar views.
+- **Responsive UI**: Designed to work across different screen sizes.
+- **State Management**: Global state management using Zustand for event storage.
 
-- Configure the top-level `parserOptions` property like this:
+## Tech Stack
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-});
+- **React**
+- **TypeScript**
+- **React Big Calendar**
+- **Date-fns**
+- **Tailwind CSS**
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js and npm/yarn installed.
+
+### Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/JS-JeevaSaravanan/calendar-app.git
+   cd calendar-app
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+
+3. Start the development server:
+
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+
+4. Open your browser and navigate to `http://localhost:3000`.
+
+## How It Works
+
+### Calendar Component
+
+The `CalendarSection` component renders the calendar UI using `react-big-calendar`. Users can create new events by selecting a time slot, which opens a modal (`EventCreator`) to input event details.
+
+### Event Management
+
+Events are managed using the custom store `useEventListStore`. You can add, update, and delete events, with changes automatically reflected on the calendar.
+
+### Event Creation
+
+The `EventCreator` modal allows users to input event details, including title, description, time, and color. Upon submission, the event is added to the global state and rendered on the calendar.
+
+### Event Styling
+
+Each event is styled using a custom color, which can be selected during event creation. The color is applied as the event's background color.
+
+## Folder Structure
+
+```
+src/
+│
+├── components/
+│   ├── CalendarSection.tsx   # Calendar UI and event handling
+│   ├── EventCreator.tsx      # Modal for creating/editing events
+│
+├── store/
+│   └── useEventListStore.ts  # Global state for managing events
+│
+├── App.tsx                   # Main app component
+├── index.tsx                 # Entry point for React
+└── tailwind.config.js        # Tailwind CSS configuration
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## Deploying to GitHub Pages
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react';
+Follow these steps to deploy your app to **GitHub Pages**:
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-});
+### Step 1: Install `gh-pages`
+
+Install the `gh-pages` package:
+
+```bash
+npm install gh-pages --save-dev
 ```
+
+### Step 2: Update `package.json`
+
+1. Add a `homepage` field to specify where the app will be hosted:
+
+   ```json
+   "homepage": "https://JS-JeevaSaravanan.github.io/calendar-app"
+   ```
+
+2. Add the `predeploy` and `deploy` scripts:
+
+   ```json
+   "scripts": {
+     "dev": "vite",
+     "build": "tsc -b && vite build",
+     "predeploy": "vite build",
+     "deploy": "gh-pages -d dist"
+   }
+
+   ```
+
+### Step 3: Build and Deploy
+
+1. Build your app:
+
+   ```bash
+   npm run build
+   ```
+
+2. Deploy the app:
+
+   ```bash
+
+   npm run deploy
+   ```
+
+### Step 4: Access Your App
+
+After deployment, your app will be available at:
+
+```
+https://JS-JeevaSaravanan.github.io/calendar-app
+```
+
+## Contributing
+
+1. Fork this repository.
+2. Create a new branch for your feature/fix.
+3. Make changes and commit them.
+4. Push to your fork and create a pull request.

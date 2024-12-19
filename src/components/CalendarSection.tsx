@@ -1,14 +1,9 @@
 import React, { useState } from 'react';
-import {
-  Calendar,
-  dateFnsLocalizer,
-  Event as BigCalendarEvent,
-  SlotInfo,
-} from 'react-big-calendar';
+import { Calendar, dateFnsLocalizer, SlotInfo } from 'react-big-calendar';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { enUS } from 'date-fns/locale';
-import useEventListStore from '../store/useEventListStore';
+import useEventListStore, { IEvent } from '../store/useEventListStore';
 import EventCreator from './EventCreator';
 
 const locales = { 'en-US': enUS };
@@ -28,7 +23,7 @@ const CalendarSection: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTime, setSelectedTime] = useState<SlotInfo | null>(null);
 
-  const eventStyleGetter = (event: BigCalendarEvent) => ({
+  const eventStyleGetter = (event: IEvent) => ({
     style: {
       backgroundColor: event.color,
       borderRadius: '8px',
@@ -49,9 +44,9 @@ const CalendarSection: React.FC = () => {
     setSelectedTime(null);
   };
 
-  const handleCreateEvent = (newEvent: BigCalendarEvent) => {
-    addEvent(newEvent);
-    setIsModalOpen(false);
+  const handleCreateEvent = (newEvent: IEvent) => {
+    addEvent(newEvent); // Add the mapped event to the store
+    setIsModalOpen(false); // Close the modal
   };
 
   return (

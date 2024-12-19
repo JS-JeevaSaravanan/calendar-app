@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-type Event = {
+export type IEvent = {
   id: number;
   title: string;
   description: string;
@@ -10,17 +10,17 @@ type Event = {
 };
 
 type EventListStore = {
-  events: Event[];
-  addEvent: (event: Event) => void;
+  events: IEvent[];
+  addEvent: (event: IEvent) => void;
   deleteEvent: (id: number) => void;
-  updateEvent: (id: number, updatedData: Partial<Event>) => void;
+  updateEvent: (id: number, updatedData: Partial<IEvent>) => void;
 };
 
-const getStoredEvents = (): Event[] => {
+const getStoredEvents = (): IEvent[] => {
   try {
     const storedEvents = localStorage.getItem('events');
     if (storedEvents) {
-      const parsedEvents: Event[] = JSON.parse(storedEvents); // Specify Event type here
+      const parsedEvents: IEvent[] = JSON.parse(storedEvents); // Specify Event type here
       return parsedEvents.map((event) => ({
         ...event,
         start: new Date(event.start),
@@ -33,7 +33,7 @@ const getStoredEvents = (): Event[] => {
   return [];
 };
 
-const setStoredEvents = (events: Event[]) => {
+const setStoredEvents = (events: IEvent[]) => {
   try {
     localStorage.setItem('events', JSON.stringify(events));
   } catch (error) {

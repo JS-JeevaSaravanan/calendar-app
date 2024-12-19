@@ -1,12 +1,16 @@
 import React from 'react';
-import { Event } from 'react-big-calendar';
 import { format } from 'date-fns';
+import { IEvent } from '../store/useEventListStore';
 
 interface EventListProps {
-  events: Event[];
+  events: IEvent[];
 }
 
 const EventList: React.FC<EventListProps> = ({ events }) => {
+  const getFormattedStartTime = (event: IEvent) => {
+    return event.start ? format(event.start, 'hh:mm a') : 'N/A';
+  };
+
   return (
     <div>
       <h2 className="text-xl font-bold mb-4 text-gray-800">My Schedule</h2>
@@ -33,7 +37,7 @@ const EventList: React.FC<EventListProps> = ({ events }) => {
           <li key={index} className="text-gray-700 mb-2 text-sm">
             {event.title}{' '}
             <span className="text-gray-500">
-              - {format(event.start, 'hh:mm a')}
+              - {getFormattedStartTime(event)}
             </span>
           </li>
         ))}

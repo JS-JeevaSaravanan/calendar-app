@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { SlotInfo } from 'react-big-calendar';
+import { IEvent } from '../store/useEventListStore';
 
 interface EventCreatorProps {
   onClose: () => void;
   open: boolean;
-  onCreate: (event: Event) => void;
+  onCreate: (event: IEvent) => void;
   selectedTime: SlotInfo;
 }
 
@@ -28,7 +29,7 @@ const EventCreator: React.FC<EventCreatorProps> = ({
       return;
     }
 
-    const newEvent: Event = {
+    const newEvent: IEvent = {
       id: Date.now(),
       title,
       description,
