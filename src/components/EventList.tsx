@@ -1,19 +1,36 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { IEvent } from '../store/useEventListStore';
 import useEventListStore from '../store/useEventListStore';
 
 const EventList: React.FC = () => {
   const events = useEventListStore((state) => state.events);
+  const deleteEvent = useEventListStore((state) => state.deleteEvent);
+  const updateEventStatus = useEventListStore(
+    (state) => state.updateEventStatus,
+  );
+
+  const [hoveredEvent, setHoveredEvent] = useState<number | null>(null);
 
   const getFormattedStartTime = (event: IEvent) => {
     return event.start ? format(new Date(event.start), 'hh:mm a') : 'N/A';
   };
 
-  const upcomingEvents = events.filter((event) => {
-    const eventStart = new Date(event.start);
-    return eventStart > new Date();
-  });
+  const upcomingEvents = events
+    .filter((event) => event.isActive)
+    .filter((event) => new Date(event.start) > new Date())
+    .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+
+  const handleCheckboxChange = (eventId: string) => {
+    updateEventStatus(eventId);
+  };
+
+  const handleDeleteEvent = (eventId: string) => {
+    deleteEvent(eventId);
+  };
+
+  const handleMouseEnter = (eventId: number) => setHoveredEvent(eventId);
+  const handleMouseLeave = () => setHoveredEvent(null);
 
   return (
     <div className="bg-white rounded-lg">
@@ -24,18 +41,39 @@ const EventList: React.FC = () => {
         <ul className="space-y-2 px-4 overflow-y-auto max-h-[300px]">
           {events.map((event, index) => (
             <li
-              key={index}
+              key={event.id}
               className="flex items-center gap-2 p-2 rounded-md hover:bg-gray-50 transition-colors"
+              onMouseEnter={() => handleMouseEnter(index)}
+              onMouseLeave={handleMouseLeave}
             >
-              <span
-                className="w-4 h-4 rounded-full"
-                style={{ backgroundColor: event.color }}
-              ></span>
+              <input
+                type="checkbox"
+                checked={event.isActive}
+                onChange={() => handleCheckboxChange(event.id)}
+                className="w-4 h-4 border-gray-300 rounded"
+                style={{ accentColor: event.color }}
+              />
               <div className="flex-1">
                 <p className="text-sm font-medium text-gray-800">
                   {event.title}
                 </p>
               </div>
+              {hoveredEvent === index && (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleDeleteEvent(event.id)}
+                    className="text-red-600 hover:text-red-800"
+                  >
+                    <i className="fas fa-trash"></i>
+                  </button>
+                  <button
+                    onClick={() => console.log('Edit event')}
+                    className="text-blue-600 hover:text-blue-800"
+                  >
+                    <i className="fas fa-edit"></i>
+                  </button>
+                </div>
+              )}
             </li>
           ))}
         </ul>
@@ -48,8 +86,10 @@ const EventList: React.FC = () => {
         <ul className="space-y-2 px-4 overflow-y-auto max-h-[300px]">
           {upcomingEvents.map((event, index) => (
             <li
-              key={index}
+              key={event.id}
               className="flex items-center gap-3 p-2 rounded-md hover:bg-gray-50 transition-colors"
+              onMouseEnter={() => handleMouseEnter(index)}
+              onMouseLeave={handleMouseLeave}
             >
               {event.image && (
                 <img
@@ -67,6 +107,22 @@ const EventList: React.FC = () => {
                   {event.description || 'No description'}
                 </p>
               </div>
+              {hoveredEvent === index && (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleDeleteEvent(event.id)}
+                    className="text-red-600 hover:text-red-800"
+                  >
+                    <i className="fas fa-trash"></i>
+                  </button>
+                  <button
+                    onClick={() => console.log('Edit event')}
+                    className="text-blue-600 hover:text-blue-800"
+                  >
+                    <i className="fas fa-edit"></i>
+                  </button>
+                </div>
+              )}
             </li>
           ))}
         </ul>

@@ -53,6 +53,7 @@ const EventCreator: React.FC<EventCreatorProps> = ({
       end: to,
       color,
       image: compressedImage || getDefaultImage(),
+      isActive: true,
     };
 
     onCreate(newEvent);

@@ -69,6 +69,8 @@ const CalendarSection: React.FC = () => {
     setIsModalOpen(false);
   };
 
+  const activeEvents = events.filter((event) => event.isActive);
+
   return (
     <main className="w-3/4 p-6">
       <div className="mb-6">
@@ -78,7 +80,7 @@ const CalendarSection: React.FC = () => {
       <div className="rounded-lg border border-gray-200 shadow-md bg-white">
         <Calendar
           localizer={localizer}
-          events={events}
+          events={activeEvents}
           startAccessor="start"
           endAccessor="end"
           defaultView="week"

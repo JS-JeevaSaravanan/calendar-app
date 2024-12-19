@@ -8,28 +8,28 @@ export type IEvent = {
   end: Date;
   color: string;
   image: string;
+  isActive: boolean;
 };
 
 type EventListStore = {
   events: IEvent[];
   addEvent: (event: IEvent) => void;
   deleteEvent: (id: string) => void;
-  updateEvent: (id: string, updatedData: Partial<IEvent>) => void;
+  updateEventStatus: (id: string) => void;
 };
 
 const getStoredEvents = (): IEvent[] => {
   try {
     const storedEvents = localStorage.getItem('events');
     if (storedEvents) {
-      const parsedEvents: IEvent[] = JSON.parse(storedEvents); // Specify Event type here
-      return parsedEvents.map((event) => ({
+      return JSON.parse(storedEvents).map((event: IEvent) => ({
         ...event,
         start: new Date(event.start),
         end: new Date(event.end),
       }));
     }
-  } catch (error) {
-    console.error('Error reading events from localStorage:', error);
+  } catch {
+    return [];
   }
   return [];
 };
@@ -37,8 +37,8 @@ const getStoredEvents = (): IEvent[] => {
 const setStoredEvents = (events: IEvent[]) => {
   try {
     localStorage.setItem('events', JSON.stringify(events));
-  } catch (error) {
-    console.error('Error saving events to localStorage:', error);
+  } catch {
+    console.error('Failed to store events');
   }
 };
 
@@ -59,10 +59,10 @@ const useEventListStore = create<EventListStore>((set) => ({
       return { events: updatedEvents };
     }),
 
-  updateEvent: (id, updatedData) =>
+  updateEventStatus: (id) =>
     set((state) => {
       const updatedEvents = state.events.map((event) =>
-        event.id === id ? { ...event, ...updatedData } : event,
+        event.id === id ? { ...event, isActive: !event.isActive } : event,
       );
       setStoredEvents(updatedEvents);
       return { events: updatedEvents };
