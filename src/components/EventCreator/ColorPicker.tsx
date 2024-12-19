@@ -18,7 +18,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ color, setColor }) => (
           type="button"
           style={{ backgroundColor: option }}
           onClick={() => setColor(option)}
-          className={`w-8 h-8 rounded-full border-2 border-white ${color === option ? 'ring-2 ring-indigo-500' : ''}`}
+          className={`w-5 h-5 rounded-full border-2 border-white ${color === option ? 'ring-2 ring-indigo-500' : ''}`}
         />
       ))}
     </div>

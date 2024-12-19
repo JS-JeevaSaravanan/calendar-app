@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { SlotInfo } from 'react-big-calendar';
-import { IEvent } from '../store/useEventListStore';
-import { compressImage, getDefaultImage } from '../utils/imageUtils';
-import { colorOptions } from '../constants/colorOptions';
-import InputField from './EventCreator/InputField';
-import TextareaField from './EventCreator/TextAreaField';
-import DateTimeField from './EventCreator/DateTimeField';
-import ColorPicker from './EventCreator/ColorPicker';
-import ImageUpload from './EventCreator/ImageUpload';
+import { IEvent } from '../store/useEventListStore.ts';
+import { compressImage, getDefaultImage } from '../utils/imageUtils.ts';
+import { colorOptions } from '../constants/colorOptions.ts';
+import InputField from './EventCreator/InputField.tsx';
+import TextareaField from './EventCreator/TextAreaField.tsx';
+import DateTimeField from './EventCreator/DateTimeField.tsx';
+import ColorPicker from './EventCreator/ColorPicker.tsx';
+import ImageUpload from './EventCreator/ImageUpload.tsx'; // Import the new component
 
 interface EventCreatorProps {
   onClose: () => void;
@@ -30,6 +30,7 @@ const EventCreator: React.FC<EventCreatorProps> = ({
   const [to, setTo] = useState<Date>(new Date());
   const [color, setColor] = useState(colorOptions[0]);
   const [image, setImage] = useState<File | null>(null);
+  const [imageBase64, setImageBase64] = useState<string | null>(null);
 
   useEffect(() => {
     if (selectedEvent) {
@@ -38,21 +39,18 @@ const EventCreator: React.FC<EventCreatorProps> = ({
       setFrom(selectedEvent.start);
       setTo(selectedEvent.end);
       setColor(selectedEvent.color);
-      setImage(
-        selectedEvent.image
-          ? new File([selectedEvent.image], 'image', { type: 'image/jpeg' })
-          : null,
-      ); // If image exists, set it
+
+      if (selectedEvent.image) {
+        setImageBase64(selectedEvent.image);
+        setImage(null);
+      } else {
+        setImage(null);
+      }
     } else if (selectedTime) {
       setFrom(selectedTime.start);
       setTo(selectedTime.end);
     }
   }, [selectedEvent, selectedTime]);
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) setImage(file);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,7 +74,7 @@ const EventCreator: React.FC<EventCreatorProps> = ({
       start: from,
       end: to,
       color,
-      image: compressedImage || getDefaultImage(),
+      image: compressedImage || (imageBase64 ? imageBase64 : getDefaultImage()), // use base64 if available
       isActive: true,
     };
 
@@ -91,18 +89,22 @@ const EventCreator: React.FC<EventCreatorProps> = ({
     setTo(new Date());
     setColor(colorOptions[0]);
     setImage(null);
+    setImageBase64(null); // Clear base64 image
   };
 
   if (!open) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white rounded-lg shadow-lg w-96 p-6">
+      <div className="bg-white rounded-xl shadow-md w-80 p-4 max-h-[90vh] overflow-auto">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">
+          <h2 className="text-lg font-semibold text-gray-800">
             {selectedEvent ? 'Edit Event' : 'Create New Event'}
           </h2>
-          <button className="text-xl font-bold" onClick={onClose}>
+          <button
+            className="text-lg font-bold text-gray-600 hover:text-gray-800"
+            onClick={onClose}
+          >
             X
           </button>
         </div>
@@ -132,15 +134,18 @@ const EventCreator: React.FC<EventCreatorProps> = ({
             setValue={setTo}
           />
           <ColorPicker color={color} setColor={setColor} />
+
           <ImageUpload
+            imageBase64={imageBase64}
             image={image}
-            onImageUpload={handleImageUpload}
             setImage={setImage}
+            setImageBase64={setImageBase64}
           />
-          <div className="mt-6">
+
+          <div className="mt-4">
             <button
               type="submit"
-              className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
             >
               {selectedEvent ? 'Save Changes' : 'Create Event'}
             </button>

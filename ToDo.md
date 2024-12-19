@@ -9,4 +9,4 @@
 ## Bugs pending
 
 - [ ] Fix Timing sync bugs
-- [ ] Image upload re-edit bugs
+- [ ] Default image don't show as uploaded and don't save in events local storage
