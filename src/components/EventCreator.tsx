@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { SlotInfo } from 'react-big-calendar';
-import { IEvent } from '../store/useEventListStore.ts';
-import { compressImage, getDefaultImage } from '../utils/imageUtils.ts';
-import { colorOptions } from '../constants/colorOptions.ts';
+import { IEvent } from '../store/useEventListStore';
+import { compressImage, getDefaultImage } from '../utils/imageUtils';
+import { colorOptions } from '../constants/colorOptions';
+import InputField from './EventCreator/InputField';
+import TextareaField from './EventCreator/TextAreaField';
+import DateTimeField from './EventCreator/DateTimeField';
+import ColorPicker from './EventCreator/ColorPicker';
+import ImageUpload from './EventCreator/ImageUpload';
 
 interface EventCreatorProps {
   onClose: () => void;
@@ -33,6 +38,11 @@ const EventCreator: React.FC<EventCreatorProps> = ({
       setFrom(selectedEvent.start);
       setTo(selectedEvent.end);
       setColor(selectedEvent.color);
+      setImage(
+        selectedEvent.image
+          ? new File([selectedEvent.image], 'image', { type: 'image/jpeg' })
+          : null,
+      ); // If image exists, set it
     } else if (selectedTime) {
       setFrom(selectedTime.start);
       setTo(selectedTime.end);
@@ -121,71 +131,12 @@ const EventCreator: React.FC<EventCreatorProps> = ({
             value={to}
             setValue={setTo}
           />
-
-          <div className="mb-4">
-            <label
-              htmlFor="color"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Color
-            </label>
-            <div className="flex space-x-2">
-              {colorOptions.map((option, index) => (
-                <button
-                  key={index}
-                  type="button"
-                  style={{ backgroundColor: option }}
-                  onClick={() => setColor(option)}
-                  className={`w-8 h-8 rounded-full border-2 border-white ${color === option ? 'ring-2 ring-indigo-500' : ''}`}
-                />
-              ))}
-            </div>
-          </div>
-
-          <div className="mb-4">
-            <label
-              htmlFor="image"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Upload Image
-            </label>
-            <div className="relative">
-              <input
-                id="image"
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-              />
-              <button
-                type="button"
-                className="w-full bg-gray-200 border border-gray-300 rounded-md py-3 text-gray-700 text-sm flex justify-center items-center"
-                onClick={() => document.getElementById('image')?.click()}
-                aria-label="Upload event image"
-              >
-                {image ? (
-                  <>
-                    <img
-                      src={URL.createObjectURL(image)}
-                      alt="Event Image"
-                      className="w-full h-24 object-cover rounded-md"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setImage(null)}
-                      className="absolute top-0 right-0 p-2 text-red-600"
-                      aria-label="Remove image"
-                    >
-                      X
-                    </button>
-                  </>
-                ) : (
-                  <span>Choose an image</span>
-                )}
-              </button>
-            </div>
-          </div>
-
+          <ColorPicker color={color} setColor={setColor} />
+          <ImageUpload
+            image={image}
+            onImageUpload={handleImageUpload}
+            setImage={setImage}
+          />
           <div className="mt-6">
             <button
               type="submit"
@@ -199,85 +150,5 @@ const EventCreator: React.FC<EventCreatorProps> = ({
     </div>
   );
 };
-
-const InputField = ({
-  id,
-  label,
-  value,
-  setValue,
-}: {
-  id: string;
-  label: string;
-  value: string;
-  setValue: React.Dispatch<React.SetStateAction<string>>;
-}) => (
-  <div className="mb-4">
-    <label htmlFor={id} className="block text-sm font-medium text-gray-700">
-      {label}
-    </label>
-    <input
-      id={id}
-      type="text"
-      placeholder={`Enter ${label.toLowerCase()}`}
-      value={value}
-      onChange={(e) => setValue(e.target.value)}
-      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-      required
-    />
-  </div>
-);
-
-const TextareaField = ({
-  id,
-  label,
-  value,
-  setValue,
-}: {
-  id: string;
-  label: string;
-  value: string;
-  setValue: React.Dispatch<React.SetStateAction<string>>;
-}) => (
-  <div className="mb-4">
-    <label htmlFor={id} className="block text-sm font-medium text-gray-700">
-      {label}
-    </label>
-    <textarea
-      id={id}
-      placeholder={`Enter ${label.toLowerCase()}`}
-      value={value}
-      onChange={(e) => setValue(e.target.value)}
-      rows={3}
-      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-      required
-    />
-  </div>
-);
-
-const DateTimeField = ({
-  id,
-  label,
-  value,
-  setValue,
-}: {
-  id: string;
-  label: string;
-  value: Date;
-  setValue: React.Dispatch<React.SetStateAction<Date>>;
-}) => (
-  <div className="mb-4">
-    <label htmlFor={id} className="block text-sm font-medium text-gray-700">
-      {label}
-    </label>
-    <input
-      id={id}
-      type="datetime-local"
-      value={value.toISOString().slice(0, 16)}
-      onChange={(e) => setValue(new Date(e.target.value))}
-      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-      required
-    />
-  </div>
-);
 
 export default EventCreator;

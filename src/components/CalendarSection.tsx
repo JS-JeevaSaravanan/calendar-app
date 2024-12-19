@@ -1,11 +1,11 @@
-// CalendarSection Component
 import React, { useState } from 'react';
-import { Calendar, dateFnsLocalizer, SlotInfo, View } from 'react-big-calendar';
+import { Calendar, dateFnsLocalizer, SlotInfo } from 'react-big-calendar';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { enUS } from 'date-fns/locale';
 import useEventListStore, { IEvent } from '../store/useEventListStore';
 import EventCreator from './EventCreator';
+import CalendarToolbar from './CalendarToolbar';
 
 const locales = { 'en-US': enUS };
 
@@ -16,25 +16,6 @@ const localizer = dateFnsLocalizer({
   getDay,
   locales,
 });
-
-const CustomToolbar: React.FC<any> = ({ onView, label, view }) => {
-  return (
-    <div className="flex justify-between items-center py-4 px-6 border-b border-gray-200 bg-white">
-      <h3 className="text-xl font-semibold text-gray-800">{label}</h3>
-      <div className="flex gap-2 items-center">
-        {['day', 'week', 'month'].map((viewType) => (
-          <button
-            key={viewType}
-            className={`px-4 py-2 rounded-md ${view === viewType ? 'bg-indigo-600 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
-            onClick={() => onView(viewType as View)} // Cast string to View type
-          >
-            {viewType.charAt(0).toUpperCase() + viewType.slice(1)}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-};
 
 const CalendarSection: React.FC = () => {
   const events = useEventListStore((state) => state.events);
@@ -77,9 +58,14 @@ const CalendarSection: React.FC = () => {
 
   const handleSaveEvent = (event: IEvent) => {
     if (selectedEvent) {
-      updateEvent(event.id, event); // Update existing event
+      updateEvent(event.id, event);
     } else {
-      addEvent(event); // Create new event
+      const newEvent = {
+        ...event,
+        start: selectedTime?.start || new Date(),
+        end: selectedTime?.end || new Date(),
+      };
+      addEvent(newEvent);
     }
     setIsModalOpen(false);
   };
@@ -87,7 +73,7 @@ const CalendarSection: React.FC = () => {
   const activeEvents = events.filter((event) => event.isActive);
 
   return (
-    <main className="w-3/4 p-6">
+    <main className="w-full p-6 bg-gray-50">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-800">Calendar</h1>
       </div>
@@ -106,7 +92,7 @@ const CalendarSection: React.FC = () => {
           onSelectSlot={handleSelectSlot}
           onSelectEvent={handleSelectEvent}
           components={{
-            toolbar: (props) => <CustomToolbar {...props} />,
+            toolbar: (props) => <CalendarToolbar {...props} />, // Updated to sync toolbar design
           }}
         />
       </div>

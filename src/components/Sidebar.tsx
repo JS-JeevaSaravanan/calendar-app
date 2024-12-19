@@ -1,8 +1,16 @@
 import React from 'react';
-import EventList from './EventList';
 import { BsHouse, BsBook } from 'react-icons/bs';
+import FilterEventList from './FilterEventList.tsx';
+import UpcomingEventList from './UpcomingEventList.tsx';
+import useEventListStore from '../store/useEventListStore';
 
 const Sidebar: React.FC = () => {
+  const events = useEventListStore((state) => state.events);
+  const deleteEvent = useEventListStore((state) => state.deleteEvent);
+  const updateEventStatus = useEventListStore(
+    (state) => state.updateEventStatus,
+  );
+
   const navItems = [
     { icon: <BsHouse />, label: 'Home' },
     {
@@ -14,7 +22,6 @@ const Sidebar: React.FC = () => {
 
   return (
     <aside className="w-64 bg-white p-4 border-r border-gray-200 shadow-md h-screen flex flex-col">
-      {' '}
       <div className="mb-6">
         <h1 className="text-lg font-semibold text-gray-800 mb-4">Academi</h1>
         <nav>
@@ -54,8 +61,14 @@ const Sidebar: React.FC = () => {
           </ul>
         </nav>
       </div>
+
       <div className="flex-1 overflow-y-auto pt-4">
-        <EventList />
+        <FilterEventList
+          events={events}
+          updateEventStatus={updateEventStatus}
+          deleteEvent={deleteEvent}
+        />
+        <UpcomingEventList events={events} />
       </div>
     </aside>
   );
