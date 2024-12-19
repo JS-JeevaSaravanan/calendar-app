@@ -1,0 +1,4 @@
+- [ ] Add time zone functionality to the app
+- [ ] Multiple schedules support ( current only one schedule is supported)
+- [ ] Add a feature to add reminders to the events
+- [ ] Make sidebars accessible for each schedules and events

@@ -7,6 +7,7 @@ export type IEvent = {
   start: Date;
   end: Date;
   color: string;
+  image: string;
 };
 
 type EventListStore = {

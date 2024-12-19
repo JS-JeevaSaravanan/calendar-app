@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { SlotInfo } from 'react-big-calendar';
-import { IEvent } from '../store/useEventListStore';
+import { IEvent } from '../store/useEventListStore.ts';
+import { compressImage, getDefaultImage } from '../utils/imageUtils.ts';
+import { colorOptions } from '../constants/colorOptions.ts';
 
 interface EventCreatorProps {
   onClose: () => void;
@@ -19,15 +21,29 @@ const EventCreator: React.FC<EventCreatorProps> = ({
   const [description, setDescription] = useState('');
   const [from, setFrom] = useState(selectedTime.start);
   const [to, setTo] = useState(selectedTime.end);
-  const [color, setColor] = useState('#ffffff');
+  const [color, setColor] = useState(colorOptions[0]);
+  const [image, setImage] = useState<File | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) setImage(file);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!title || !description || !from || !to || !color) {
       alert('Please fill in all fields.');
       return;
     }
+
+    // Check if the end time is after the start time
+    if (from >= to) {
+      alert('End time must be later than start time.');
+      return;
+    }
+
+    const compressedImage = image ? await compressImage(image) : null;
 
     const newEvent: IEvent = {
       id: Date.now(),
@@ -36,14 +52,20 @@ const EventCreator: React.FC<EventCreatorProps> = ({
       start: from,
       end: to,
       color,
+      image: compressedImage || getDefaultImage(),
     };
 
     onCreate(newEvent);
+    resetForm();
+  };
+
+  const resetForm = () => {
     setTitle('');
     setDescription('');
     setFrom(selectedTime.start);
     setTo(selectedTime.end);
-    setColor('#ffffff');
+    setColor(colorOptions[0]); // Reset color to default
+    setImage(null);
   };
 
   if (!open) return null;
@@ -58,75 +80,30 @@ const EventCreator: React.FC<EventCreatorProps> = ({
           </button>
         </div>
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label
-              htmlFor="title"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Event Title
-            </label>
-            <input
-              id="title"
-              type="text"
-              placeholder="Enter event title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              required
-            />
-          </div>
-
-          <div className="mb-4">
-            <label
-              htmlFor="description"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Description
-            </label>
-            <textarea
-              id="description"
-              placeholder="Enter event description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={3}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              required
-            />
-          </div>
-
-          <div className="mb-4">
-            <label
-              htmlFor="start"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Start Time
-            </label>
-            <input
-              id="start"
-              type="datetime-local"
-              value={from.toISOString().slice(0, 16)}
-              onChange={(e) => setFrom(new Date(e.target.value))}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              required
-            />
-          </div>
-
-          <div className="mb-4">
-            <label
-              htmlFor="end"
-              className="block text-sm font-medium text-gray-700"
-            >
-              End Time
-            </label>
-            <input
-              id="end"
-              type="datetime-local"
-              value={to.toISOString().slice(0, 16)}
-              onChange={(e) => setTo(new Date(e.target.value))}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              required
-            />
-          </div>
+          <InputField
+            id="title"
+            label="Event Title"
+            value={title}
+            setValue={setTitle}
+          />
+          <TextareaField
+            id="description"
+            label="Description"
+            value={description}
+            setValue={setDescription}
+          />
+          <DateTimeField
+            id="start"
+            label="Start Time"
+            value={from}
+            setValue={setFrom}
+          />
+          <DateTimeField
+            id="end"
+            label="End Time"
+            value={to}
+            setValue={setTo}
+          />
 
           <div className="mb-4">
             <label
@@ -135,14 +112,61 @@ const EventCreator: React.FC<EventCreatorProps> = ({
             >
               Color
             </label>
-            <input
-              id="color"
-              type="color"
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
-              className="mt-1 block w-full"
-              required
-            />
+            <div className="flex space-x-2">
+              {colorOptions.map((option, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  style={{ backgroundColor: option }}
+                  onClick={() => setColor(option)}
+                  className={`w-8 h-8 rounded-full border-2 border-white ${color === option ? 'ring-2 ring-indigo-500' : ''}`}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <label
+              htmlFor="image"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Upload Image
+            </label>
+            <div className="relative">
+              <input
+                id="image"
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+              <button
+                type="button"
+                className="w-full bg-gray-200 border border-gray-300 rounded-md py-3 text-gray-700 text-sm flex justify-center items-center"
+                onClick={() => document.getElementById('image')?.click()}
+                aria-label="Upload event image"
+              >
+                {image ? (
+                  <>
+                    <img
+                      src={URL.createObjectURL(image)}
+                      alt="Event Image"
+                      className="w-full h-24 object-cover rounded-md"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setImage(null)}
+                      className="absolute top-0 right-0 p-2 text-red-600"
+                      aria-label="Remove image"
+                    >
+                      X
+                    </button>
+                  </>
+                ) : (
+                  <span>Choose an image</span>
+                )}
+              </button>
+            </div>
           </div>
 
           <div className="mt-6">
@@ -158,5 +182,85 @@ const EventCreator: React.FC<EventCreatorProps> = ({
     </div>
   );
 };
+
+const InputField = ({
+  id,
+  label,
+  value,
+  setValue,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  setValue: React.Dispatch<React.SetStateAction<string>>;
+}) => (
+  <div className="mb-4">
+    <label htmlFor={id} className="block text-sm font-medium text-gray-700">
+      {label}
+    </label>
+    <input
+      id={id}
+      type="text"
+      placeholder={`Enter ${label.toLowerCase()}`}
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+      required
+    />
+  </div>
+);
+
+const TextareaField = ({
+  id,
+  label,
+  value,
+  setValue,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  setValue: React.Dispatch<React.SetStateAction<string>>;
+}) => (
+  <div className="mb-4">
+    <label htmlFor={id} className="block text-sm font-medium text-gray-700">
+      {label}
+    </label>
+    <textarea
+      id={id}
+      placeholder={`Enter ${label.toLowerCase()}`}
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+      rows={3}
+      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+      required
+    />
+  </div>
+);
+
+const DateTimeField = ({
+  id,
+  label,
+  value,
+  setValue,
+}: {
+  id: string;
+  label: string;
+  value: Date;
+  setValue: React.Dispatch<React.SetStateAction<Date>>;
+}) => (
+  <div className="mb-4">
+    <label htmlFor={id} className="block text-sm font-medium text-gray-700">
+      {label}
+    </label>
+    <input
+      id={id}
+      type="datetime-local"
+      value={value.toISOString().slice(0, 16)}
+      onChange={(e) => setValue(new Date(e.target.value))}
+      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+      required
+    />
+  </div>
+);
 
 export default EventCreator;

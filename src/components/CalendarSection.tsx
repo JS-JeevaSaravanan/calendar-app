@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { Calendar, dateFnsLocalizer, SlotInfo } from 'react-big-calendar';
+import {
+  Calendar,
+  dateFnsLocalizer,
+  SlotInfo,
+  ToolbarProps,
+  View,
+} from 'react-big-calendar';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { enUS } from 'date-fns/locale';
@@ -16,6 +22,25 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
+const CustomToolbar: React.FC<ToolbarProps> = ({ onView, label, view }) => {
+  return (
+    <div className="flex justify-between items-center py-4 px-6 border-b border-gray-200 bg-white">
+      <h3 className="text-xl font-semibold text-gray-800">{label}</h3>
+      <div className="flex gap-2 items-center">
+        {['day', 'week', 'month'].map((viewType) => (
+          <button
+            key={viewType}
+            className={`px-4 py-2 rounded-md ${view === viewType ? 'bg-indigo-600 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
+            onClick={() => onView(viewType as View)} // Cast string to View type
+          >
+            {viewType.charAt(0).toUpperCase() + viewType.slice(1)}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const CalendarSection: React.FC = () => {
   const events = useEventListStore((state) => state.events);
   const addEvent = useEventListStore((state) => state.addEvent);
@@ -28,9 +53,10 @@ const CalendarSection: React.FC = () => {
       backgroundColor: event.color,
       borderRadius: '8px',
       opacity: 0.9,
-      color: 'black',
+      color: 'white',
       border: '0px',
       display: 'block',
+      padding: '4px',
     },
   });
 
@@ -45,43 +71,31 @@ const CalendarSection: React.FC = () => {
   };
 
   const handleCreateEvent = (newEvent: IEvent) => {
-    addEvent(newEvent); // Add the mapped event to the store
-    setIsModalOpen(false); // Close the modal
+    addEvent(newEvent);
+    setIsModalOpen(false);
   };
 
   return (
-    <div className="w-3/4 p-6">
-      <div className="flex justify-between items-center mb-6">
+    <main className="w-3/4 p-6">
+      <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-800">Calendar</h1>
-        <div className="space-x-2">
-          <button className="px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-md">
-            Day
-          </button>
-          <button className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md">
-            Week
-          </button>
-          <button className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md">
-            Month
-          </button>
-          <button className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md">
-            Year
-          </button>
-        </div>
       </div>
 
-      <div className="rounded-lg border border-gray-200 shadow-sm">
+      <div className="rounded-lg border border-gray-200 shadow-md bg-white">
         <Calendar
           localizer={localizer}
           events={events}
           startAccessor="start"
           endAccessor="end"
-          defaultView="day"
+          defaultView="week"
           views={['day', 'week', 'month']}
           style={{ height: '70vh' }}
           eventPropGetter={eventStyleGetter}
-          className="p-4"
           selectable
           onSelectSlot={handleSelectSlot}
+          components={{
+            toolbar: (props) => <CustomToolbar {...props} />,
+          }}
         />
       </div>
 
@@ -93,7 +107,7 @@ const CalendarSection: React.FC = () => {
           selectedTime={selectedTime}
         />
       )}
-    </div>
+    </main>
   );
 };
 
