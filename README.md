@@ -1,152 +1,93 @@
-Here's an updated version of your `README.md` with a cleaner structure, removing the license section, and focusing on the key details for deployment and usage:
 
----
+![image](https://github.com/user-attachments/assets/399e0482-c972-4571-8820-ccd5ad7c2f01)
 
-# Calendar App with Event Management
 
-A **Calendar App** built with **React**, **TypeScript**, and **React Big Calendar**. It allows users to view, create, and manage events, with events stored globally and displayed in various calendar views.
+
+# Event Calendar App
+
+This is a React-based Event Calendar application where users can create events with details such as title, description, start and end times, color, and an image. The app includes validation for event details, supports image upload with compression, and has a responsive UI built using Tailwind CSS.
 
 ## Features
 
-- **Event Creation**: Select time slots to create events with title, description, and color.
-- **Multiple Views**: Supports Day, Week, and Month calendar views.
-- **Responsive UI**: Designed to work across different screen sizes.
-- **State Management**: Global state management using Zustand for event storage.
+- **Create Event**: Allows users to input event details including title, description, start/end times.
+- **Time Validation**: Ensures the end time is after the start time.
+- **Image Upload**: Supports image upload with compression to optimize file size.
+- **Color Picker**: Users can choose an event color from a set of predefined options.
+- **Responsive UI**: Built using Tailwind CSS for a mobile-friendly design.
+- **Event Creation Callback**: The created event data is passed to a parent component via a callback function (`onCreate`).
 
 ## Tech Stack
 
-- **React**
+- **React** (v18+)
 - **TypeScript**
-- **React Big Calendar**
-- **Date-fns**
 - **Tailwind CSS**
+- **react-big-calendar** (for calendar UI)
+- **Image compression** (using `browser-image-compression`)
 
-## Getting Started
+## Installation
 
-### Prerequisites
-
-- Node.js and npm/yarn installed.
-
-### Installation
-
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/JS-JeevaSaravanan/calendar-app.git
-   cd calendar-app
-   ```
-
-2. Install dependencies:
-
-   ```bash
-   npm install
-   # or
-   yarn install
-   ```
-
-3. Start the development server:
-
-   ```bash
-   npm run dev
-   # or
-   yarn dev
-   ```
-
-4. Open your browser and navigate to `http://localhost:3000`.
-
-## How It Works
-
-### Calendar Component
-
-The `CalendarSection` component renders the calendar UI using `react-big-calendar`. Users can create new events by selecting a time slot, which opens a modal (`EventCreator`) to input event details.
-
-### Event Management
-
-Events are managed using the custom store `useEventListStore`. You can add, update, and delete events, with changes automatically reflected on the calendar.
-
-### Event Creation
-
-The `EventCreator` modal allows users to input event details, including title, description, time, and color. Upon submission, the event is added to the global state and rendered on the calendar.
-
-### Event Styling
-
-Each event is styled using a custom color, which can be selected during event creation. The color is applied as the event's background color.
-
-## Folder Structure
-
-```
-src/
-│
-├── components/
-│   ├── CalendarSection.tsx   # Calendar UI and event handling
-│   ├── EventCreator.tsx      # Modal for creating/editing events
-│
-├── store/
-│   └── useEventListStore.ts  # Global state for managing events
-│
-├── App.tsx                   # Main app component
-├── index.tsx                 # Entry point for React
-└── tailwind.config.js        # Tailwind CSS configuration
-```
-
-## Deploying to GitHub Pages
-
-Follow these steps to deploy your app to **GitHub Pages**:
-
-### Step 1: Install `gh-pages`
-
-Install the `gh-pages` package:
+Clone the repository and install dependencies:
 
 ```bash
-npm install gh-pages --save-dev
+git clone https://github.com/JS-JeevaSaravanan/calendar-app.git
+cd calendar-app
+npm install
 ```
 
-### Step 2: Update `package.json`
+## Available Scripts
 
-1. Add a `homepage` field to specify where the app will be hosted:
+In the project directory, you can run the following commands:
 
-   ```json
-   "homepage": "https://JS-JeevaSaravanan.github.io/calendar-app"
-   ```
+### `npm run dev`
 
-2. Add the `predeploy` and `deploy` scripts:
+Starts the development server.
 
-   ```json
-   "scripts": {
-     "dev": "vite",
-     "build": "tsc -b && vite build",
-     "predeploy": "vite build",
-     "deploy": "gh-pages -d dist"
-   }
-
-   ```
-
-### Step 3: Build and Deploy
-
-1. Build your app:
-
-   ```bash
-   npm run build
-   ```
-
-2. Deploy the app:
-
-   ```bash
-
-   npm run deploy
-   ```
-
-### Step 4: Access Your App
-
-After deployment, your app will be available at:
-
-```
-https://JS-JeevaSaravanan.github.io/calendar-app
+```bash
+npm run dev
 ```
 
-## Contributing
+### `npm run build`
 
-1. Fork this repository.
-2. Create a new branch for your feature/fix.
-3. Make changes and commit them.
-4. Push to your fork and create a pull request.
+Builds the app for production, including TypeScript compilation and Vite build process.
+
+```bash
+npm run build
+```
+
+### `npm run preview`
+
+Preview the production build locally.
+
+```bash
+npm run preview
+```
+
+### `npm run lint`
+
+Run ESLint to check for code issues.
+
+```bash
+npm run lint
+```
+
+### `npm run format`
+
+Automatically format the code using Prettier.
+
+```bash
+npm run format
+```
+
+### `npm run deploy`
+
+Builds and deploys the app to GitHub Pages.
+
+```bash
+npm run deploy
+```
+
+## Conclusion
+
+This Event Calendar App allows users to easily create and manage events, with features for time validation, color selection, and image upload. It is built using modern web technologies such as React, TypeScript, and Tailwind CSS, ensuring a smooth and responsive user experience.
+
+
