@@ -1,3 +1,4 @@
+// CalendarSection Component
 import React, { useState } from 'react';
 import { Calendar, dateFnsLocalizer, SlotInfo, View } from 'react-big-calendar';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
@@ -38,9 +39,11 @@ const CustomToolbar: React.FC<any> = ({ onView, label, view }) => {
 const CalendarSection: React.FC = () => {
   const events = useEventListStore((state) => state.events);
   const addEvent = useEventListStore((state) => state.addEvent);
+  const updateEvent = useEventListStore((state) => state.updateEvent);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTime, setSelectedTime] = useState<SlotInfo | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<IEvent | null>(null);
 
   const eventStyleGetter = (event: IEvent) => ({
     style: {
@@ -56,16 +59,28 @@ const CalendarSection: React.FC = () => {
 
   const handleSelectSlot = (slotInfo: SlotInfo) => {
     setSelectedTime(slotInfo);
+    setSelectedEvent(null);
+    setIsModalOpen(true);
+  };
+
+  const handleSelectEvent = (event: IEvent) => {
+    setSelectedEvent(event);
+    setSelectedTime(null);
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedTime(null);
+    setSelectedEvent(null);
   };
 
-  const handleCreateEvent = (newEvent: IEvent) => {
-    addEvent(newEvent);
+  const handleSaveEvent = (event: IEvent) => {
+    if (selectedEvent) {
+      updateEvent(event.id, event); // Update existing event
+    } else {
+      addEvent(event); // Create new event
+    }
     setIsModalOpen(false);
   };
 
@@ -89,18 +104,20 @@ const CalendarSection: React.FC = () => {
           eventPropGetter={eventStyleGetter}
           selectable
           onSelectSlot={handleSelectSlot}
+          onSelectEvent={handleSelectEvent}
           components={{
             toolbar: (props) => <CustomToolbar {...props} />,
           }}
         />
       </div>
 
-      {isModalOpen && selectedTime && (
+      {isModalOpen && (
         <EventCreator
           onClose={handleCloseModal}
           open={isModalOpen}
-          onCreate={handleCreateEvent}
+          onSave={handleSaveEvent}
           selectedTime={selectedTime}
+          selectedEvent={selectedEvent}
         />
       )}
     </main>

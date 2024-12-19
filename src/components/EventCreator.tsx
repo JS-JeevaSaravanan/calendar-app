@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SlotInfo } from 'react-big-calendar';
 import { IEvent } from '../store/useEventListStore.ts';
 import { compressImage, getDefaultImage } from '../utils/imageUtils.ts';
@@ -7,22 +7,37 @@ import { colorOptions } from '../constants/colorOptions.ts';
 interface EventCreatorProps {
   onClose: () => void;
   open: boolean;
-  onCreate: (event: IEvent) => void;
-  selectedTime: SlotInfo;
+  onSave: (event: IEvent) => void;
+  selectedTime: SlotInfo | null;
+  selectedEvent: IEvent | null;
 }
 
 const EventCreator: React.FC<EventCreatorProps> = ({
   onClose,
   open,
-  onCreate,
+  onSave,
   selectedTime,
+  selectedEvent,
 }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [from, setFrom] = useState(selectedTime.start);
-  const [to, setTo] = useState(selectedTime.end);
+  const [from, setFrom] = useState<Date>(new Date());
+  const [to, setTo] = useState<Date>(new Date());
   const [color, setColor] = useState(colorOptions[0]);
   const [image, setImage] = useState<File | null>(null);
+
+  useEffect(() => {
+    if (selectedEvent) {
+      setTitle(selectedEvent.title);
+      setDescription(selectedEvent.description);
+      setFrom(selectedEvent.start);
+      setTo(selectedEvent.end);
+      setColor(selectedEvent.color);
+    } else if (selectedTime) {
+      setFrom(selectedTime.start);
+      setTo(selectedTime.end);
+    }
+  }, [selectedEvent, selectedTime]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -37,7 +52,6 @@ const EventCreator: React.FC<EventCreatorProps> = ({
       return;
     }
 
-    // Check if the end time is after the start time
     if (from >= to) {
       alert('End time must be later than start time.');
       return;
@@ -45,8 +59,8 @@ const EventCreator: React.FC<EventCreatorProps> = ({
 
     const compressedImage = image ? await compressImage(image) : null;
 
-    const newEvent: IEvent = {
-      id: Date.now().toString(),
+    const event: IEvent = {
+      id: selectedEvent ? selectedEvent.id : Date.now().toString(),
       title,
       description,
       start: from,
@@ -56,16 +70,16 @@ const EventCreator: React.FC<EventCreatorProps> = ({
       isActive: true,
     };
 
-    onCreate(newEvent);
+    onSave(event);
     resetForm();
   };
 
   const resetForm = () => {
     setTitle('');
     setDescription('');
-    setFrom(selectedTime.start);
-    setTo(selectedTime.end);
-    setColor(colorOptions[0]); // Reset color to default
+    setFrom(new Date());
+    setTo(new Date());
+    setColor(colorOptions[0]);
     setImage(null);
   };
 
@@ -75,7 +89,9 @@ const EventCreator: React.FC<EventCreatorProps> = ({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white rounded-lg shadow-lg w-96 p-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Create New Event</h2>
+          <h2 className="text-xl font-semibold">
+            {selectedEvent ? 'Edit Event' : 'Create New Event'}
+          </h2>
           <button className="text-xl font-bold" onClick={onClose}>
             X
           </button>
@@ -175,7 +191,7 @@ const EventCreator: React.FC<EventCreatorProps> = ({
               type="submit"
               className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-              Create Event
+              {selectedEvent ? 'Save Changes' : 'Create Event'}
             </button>
           </div>
         </form>

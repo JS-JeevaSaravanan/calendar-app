@@ -15,6 +15,7 @@ type EventListStore = {
   events: IEvent[];
   addEvent: (event: IEvent) => void;
   deleteEvent: (id: string) => void;
+  updateEvent: (id: string, updatedFields: Partial<IEvent>) => void; // New flexible update function
   updateEventStatus: (id: string) => void;
 };
 
@@ -55,6 +56,15 @@ const useEventListStore = create<EventListStore>((set) => ({
   deleteEvent: (id) =>
     set((state) => {
       const updatedEvents = state.events.filter((event) => event.id !== id);
+      setStoredEvents(updatedEvents);
+      return { events: updatedEvents };
+    }),
+
+  updateEvent: (id, updatedFields) =>
+    set((state) => {
+      const updatedEvents = state.events.map((event) =>
+        event.id === id ? { ...event, ...updatedFields } : event,
+      );
       setStoredEvents(updatedEvents);
       return { events: updatedEvents };
     }),
