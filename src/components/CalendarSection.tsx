@@ -1,12 +1,17 @@
-import React from 'react';
-import { Calendar, dateFnsLocalizer, Event } from 'react-big-calendar';
+import React, { useState } from 'react';
+import {
+  Calendar,
+  dateFnsLocalizer,
+  Event as BigCalendarEvent,
+  SlotInfo,
+} from 'react-big-calendar';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { enUS } from 'date-fns/locale';
+import useEventListStore from '../store/useEventListStore';
+import EventCreator from './EventCreator';
 
-const locales = {
-  'en-US': enUS,
-};
+const locales = { 'en-US': enUS };
 
 const localizer = dateFnsLocalizer({
   format,
@@ -16,21 +21,37 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
-interface CalendarSectionProps {
-  events: Event[];
-}
+const CalendarSection: React.FC = () => {
+  const events = useEventListStore((state) => state.events);
+  const addEvent = useEventListStore((state) => state.addEvent);
 
-const CalendarSection: React.FC<CalendarSectionProps> = ({ events }) => {
-  const eventStyleGetter = (event: Event) => {
-    const style = {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTime, setSelectedTime] = useState<SlotInfo | null>(null);
+
+  const eventStyleGetter = (event: BigCalendarEvent) => ({
+    style: {
       backgroundColor: event.color,
       borderRadius: '8px',
       opacity: 0.9,
       color: 'black',
       border: '0px',
       display: 'block',
-    };
-    return { style };
+    },
+  });
+
+  const handleSelectSlot = (slotInfo: SlotInfo) => {
+    setSelectedTime(slotInfo);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedTime(null);
+  };
+
+  const handleCreateEvent = (newEvent: BigCalendarEvent) => {
+    addEvent(newEvent);
+    setIsModalOpen(false);
   };
 
   return (
@@ -64,8 +85,19 @@ const CalendarSection: React.FC<CalendarSectionProps> = ({ events }) => {
           style={{ height: '70vh' }}
           eventPropGetter={eventStyleGetter}
           className="p-4"
+          selectable
+          onSelectSlot={handleSelectSlot}
         />
       </div>
+
+      {isModalOpen && selectedTime && (
+        <EventCreator
+          onClose={handleCloseModal}
+          open={isModalOpen}
+          onCreate={handleCreateEvent}
+          selectedTime={selectedTime}
+        />
+      )}
     </div>
   );
 };

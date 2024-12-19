@@ -12,7 +12,6 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "antd": "^5.22.5",
     "date-fns": "^4.1.0",
     "react": "^18.3.1",
     "react-big-calendar": "^1.17.0",
