@@ -46,7 +46,7 @@ const EventCreator: React.FC<EventCreatorProps> = ({
     const compressedImage = image ? await compressImage(image) : null;
 
     const newEvent: IEvent = {
-      id: Date.now(),
+      id: Date.now().toString(),
       title,
       description,
       start: from,

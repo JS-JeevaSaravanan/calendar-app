@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 export type IEvent = {
-  id: number;
+  id: string;
   title: string;
   description: string;
   start: Date;
@@ -13,8 +13,8 @@ export type IEvent = {
 type EventListStore = {
   events: IEvent[];
   addEvent: (event: IEvent) => void;
-  deleteEvent: (id: number) => void;
-  updateEvent: (id: number, updatedData: Partial<IEvent>) => void;
+  deleteEvent: (id: string) => void;
+  updateEvent: (id: string, updatedData: Partial<IEvent>) => void;
 };
 
 const getStoredEvents = (): IEvent[] => {

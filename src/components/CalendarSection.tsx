@@ -1,11 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Calendar,
-  dateFnsLocalizer,
-  SlotInfo,
-  ToolbarProps,
-  View,
-} from 'react-big-calendar';
+import { Calendar, dateFnsLocalizer, SlotInfo, View } from 'react-big-calendar';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { enUS } from 'date-fns/locale';
@@ -22,7 +16,7 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
-const CustomToolbar: React.FC<ToolbarProps> = ({ onView, label, view }) => {
+const CustomToolbar: React.FC<any> = ({ onView, label, view }) => {
   return (
     <div className="flex justify-between items-center py-4 px-6 border-b border-gray-200 bg-white">
       <h3 className="text-xl font-semibold text-gray-800">{label}</h3>
