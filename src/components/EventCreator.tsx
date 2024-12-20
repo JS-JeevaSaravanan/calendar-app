@@ -7,7 +7,7 @@ import InputField from './EventCreator/InputField.tsx';
 import TextareaField from './EventCreator/TextAreaField.tsx';
 import DateTimeField from './EventCreator/DateTimeField.tsx';
 import ColorPicker from './EventCreator/ColorPicker.tsx';
-import ImageUpload from './EventCreator/ImageUpload.tsx'; // Import the new component
+import ImageUpload from './EventCreator/ImageUpload.tsx';
 
 interface EventCreatorProps {
   onClose: () => void;
@@ -74,7 +74,7 @@ const EventCreator: React.FC<EventCreatorProps> = ({
       start: from,
       end: to,
       color,
-      image: compressedImage || (imageBase64 ? imageBase64 : getDefaultImage()), // use base64 if available
+      image: compressedImage || (imageBase64 ? imageBase64 : getDefaultImage()),
       isActive: true,
     };
 
@@ -89,7 +89,7 @@ const EventCreator: React.FC<EventCreatorProps> = ({
     setTo(new Date());
     setColor(colorOptions[0]);
     setImage(null);
-    setImageBase64(null); // Clear base64 image
+    setImageBase64(null);
   };
 
   if (!open) return null;

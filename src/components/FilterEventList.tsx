@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { IEvent } from '../store/useEventListStore';
-// import { format } from 'date-fns';
+import { FaTrash, FaEdit } from 'react-icons/fa'; // Using react-icons for cleaner UI
+import EventCreator from './EventCreator'; // Import EventCreator component
 
 interface FilterEventListProps {
   events: IEvent[];
@@ -14,10 +15,8 @@ const FilterEventList: React.FC<FilterEventListProps> = ({
   deleteEvent,
 }) => {
   const [hoveredEvent, setHoveredEvent] = useState<number | null>(null);
-
-  // const getFormattedStartTime = (event: IEvent) => {
-  //   return event.start ? format(new Date(event.start), 'hh:mm a') : 'N/A';
-  // };
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<IEvent | null>(null);
 
   const handleCheckboxChange = (eventId: string) => {
     updateEventStatus(eventId);
@@ -29,6 +28,16 @@ const FilterEventList: React.FC<FilterEventListProps> = ({
 
   const handleMouseEnter = (eventId: number) => setHoveredEvent(eventId);
   const handleMouseLeave = () => setHoveredEvent(null);
+
+  const handleEditEvent = (event: IEvent) => {
+    setSelectedEvent(event); // Set the selected event
+    setIsModalOpen(true); // Open the modal
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false); // Close the modal
+    setSelectedEvent(null); // Reset selected event
+  };
 
   return (
     <section className="mb-4">
@@ -57,21 +66,36 @@ const FilterEventList: React.FC<FilterEventListProps> = ({
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => handleDeleteEvent(event.id)}
-                  className="text-red-600 hover:text-red-800"
+                  className="text-red-600 hover:text-red-800 p-1"
+                  title="Delete Event"
                 >
-                  <i className="fas fa-trash"></i>
+                  <FaTrash />
                 </button>
                 <button
-                  onClick={() => console.log('Edit event')}
-                  className="text-blue-600 hover:text-blue-800"
+                  onClick={() => handleEditEvent(event)} // Trigger edit on button click
+                  className="text-blue-600 hover:text-blue-800 p-1"
+                  title="Edit Event"
                 >
-                  <i className="fas fa-edit"></i>
+                  <FaEdit />
                 </button>
               </div>
             )}
           </li>
         ))}
       </ul>
+
+      {isModalOpen && selectedEvent && (
+        <EventCreator
+          onClose={handleCloseModal}
+          open={isModalOpen}
+          onSave={(updatedEvent) => {
+            console.log('Event saved:', updatedEvent);
+            handleCloseModal();
+          }}
+          selectedTime={null}
+          selectedEvent={selectedEvent}
+        />
+      )}
     </section>
   );
 };
