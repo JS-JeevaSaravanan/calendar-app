@@ -9,11 +9,8 @@ interface UpcomingEventListProps {
 const UpcomingEventList: React.FC<UpcomingEventListProps> = ({ events }) => {
   const upcomingEvents = events
     .filter((event) => new Date(event.start) > new Date())
-    .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
-
-  const getFormattedStartTime = (event: IEvent) => {
-    return event.start ? format(new Date(event.start), 'hh:mm a') : 'N/A';
-  };
+    .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())
+    .slice(0, 5);
 
   return (
     <section>
@@ -36,20 +33,9 @@ const UpcomingEventList: React.FC<UpcomingEventListProps> = ({ events }) => {
             <div className="flex-1">
               <p className="text-sm font-medium text-gray-800">{event.title}</p>
               <p className="text-xs text-gray-500">
-                {getFormattedStartTime(event)} •{' '}
+                {format(new Date(event.start), 'hh:mm a')} •{' '}
                 {event.description || 'No description'}
               </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <button className="text-red-600 hover:text-red-800">
-                <i className="fas fa-trash"></i>
-              </button>
-              <button
-                onClick={() => console.log('Edit event')}
-                className="text-blue-600 hover:text-blue-800"
-              >
-                <i className="fas fa-edit"></i>
-              </button>
             </div>
           </li>
         ))}

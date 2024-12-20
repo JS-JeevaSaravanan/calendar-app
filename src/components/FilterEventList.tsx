@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { IEvent } from '../store/useEventListStore';
-import { FaTrash, FaEdit } from 'react-icons/fa'; // Using react-icons for cleaner UI
-import EventCreator from './EventCreator'; // Import EventCreator component
+import { FaTrash, FaEdit } from 'react-icons/fa';
+import EventCreator from './EventCreator';
 
 interface FilterEventListProps {
   events: IEvent[];
@@ -26,17 +26,14 @@ const FilterEventList: React.FC<FilterEventListProps> = ({
     deleteEvent(eventId);
   };
 
-  const handleMouseEnter = (eventId: number) => setHoveredEvent(eventId);
-  const handleMouseLeave = () => setHoveredEvent(null);
-
   const handleEditEvent = (event: IEvent) => {
-    setSelectedEvent(event); // Set the selected event
-    setIsModalOpen(true); // Open the modal
+    setSelectedEvent(event);
+    setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
-    setIsModalOpen(false); // Close the modal
-    setSelectedEvent(null); // Reset selected event
+    setIsModalOpen(false);
+    setSelectedEvent(null);
   };
 
   return (
@@ -49,15 +46,14 @@ const FilterEventList: React.FC<FilterEventListProps> = ({
           <li
             key={event.id}
             className="flex items-center gap-2 p-2 rounded-md hover:bg-gray-50 transition-colors"
-            onMouseEnter={() => handleMouseEnter(index)}
-            onMouseLeave={handleMouseLeave}
+            onMouseEnter={() => setHoveredEvent(index)}
+            onMouseLeave={() => setHoveredEvent(null)}
           >
             <input
               type="checkbox"
               checked={event.isActive}
               onChange={() => handleCheckboxChange(event.id)}
               className="w-4 h-4 border-gray-300 rounded"
-              style={{ accentColor: event.color }}
             />
             <div className="flex-1">
               <p className="text-sm font-medium text-gray-800">{event.title}</p>
@@ -65,18 +61,18 @@ const FilterEventList: React.FC<FilterEventListProps> = ({
             {hoveredEvent === index && (
               <div className="flex items-center gap-2">
                 <button
+                  onClick={() => handleEditEvent(event)}
+                  className="text-blue-600 hover:text-blue-800 p-1"
+                  title="Edit Event"
+                >
+                  <FaEdit />
+                </button>
+                <button
                   onClick={() => handleDeleteEvent(event.id)}
                   className="text-red-600 hover:text-red-800 p-1"
                   title="Delete Event"
                 >
                   <FaTrash />
-                </button>
-                <button
-                  onClick={() => handleEditEvent(event)} // Trigger edit on button click
-                  className="text-blue-600 hover:text-blue-800 p-1"
-                  title="Edit Event"
-                >
-                  <FaEdit />
                 </button>
               </div>
             )}

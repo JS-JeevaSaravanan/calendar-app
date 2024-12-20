@@ -1,8 +1,9 @@
 import React from 'react';
-import { BsHouse, BsBook } from 'react-icons/bs';
-import FilterEventList from './FilterEventList.tsx';
-import UpcomingEventList from './UpcomingEventList.tsx';
+import { BsHouse } from 'react-icons/bs';
+import FilterEventList from './FilterEventList';
+import UpcomingEventList from './UpcomingEventList';
 import useEventListStore from '../store/useEventListStore';
+import AcademiNav from './AcademiNav';
 
 const Sidebar: React.FC = () => {
   const events = useEventListStore((state) => state.events);
@@ -13,48 +14,26 @@ const Sidebar: React.FC = () => {
 
   const navItems = [
     { icon: <BsHouse />, label: 'Home' },
-    {
-      icon: <BsBook />,
-      label: 'Academi',
-      subItems: ['Academi Calendar', 'My Calendar'],
-    },
+    { label: 'Academi', subItems: ['Academi Calendar', 'My Calendar'] },
   ];
 
   return (
-    <aside className="w-64 bg-white p-4 border-r border-gray-200 shadow-md h-screen flex flex-col">
+    <aside
+      className="top-0 left-0 h-screen bg-white p-4 border-r border-gray-200 shadow-md flex flex-col"
+      style={{ width: '260px' }}
+    >
       <div className="mb-6">
-        <h1 className="text-lg font-semibold text-gray-800 mb-4">Academi</h1>
         <nav>
           <ul className="space-y-2">
             {navItems.map((item, index) => (
               <li key={index}>
-                <div className="flex items-center gap-3 p-2 rounded-md hover:bg-gray-100 transition-colors cursor-pointer">
-                  {item.icon && (
+                {item.label === 'Academi' && item.subItems ? (
+                  <AcademiNav subItems={item.subItems} />
+                ) : (
+                  <div className="flex items-center gap-3 px-4 py-3 rounded-md hover:bg-gray-100 transition-colors cursor-pointer">
                     <span className="text-lg text-gray-600">{item.icon}</span>
-                  )}
-                  <p className="text-gray-700 font-medium">{item.label}</p>
-                </div>
-                {item.subItems && (
-                  <ul className="pl-8 space-y-1">
-                    {item.subItems.map((subItem, subIndex) => (
-                      <li
-                        key={subIndex}
-                        className={`p-2 rounded-md hover:bg-gray-100 transition-colors cursor-pointer ${
-                          subItem === 'Academi Calendar' ? 'bg-gray-100' : ''
-                        }`}
-                      >
-                        <p
-                          className={`text-sm font-medium ${
-                            subItem === 'Academi Calendar'
-                              ? 'text-blue-500'
-                              : 'text-gray-700'
-                          }`}
-                        >
-                          {subItem}
-                        </p>
-                      </li>
-                    ))}
-                  </ul>
+                    <p className="text-gray-800 font-medium">{item.label}</p>
+                  </div>
                 )}
               </li>
             ))}
@@ -62,7 +41,7 @@ const Sidebar: React.FC = () => {
         </nav>
       </div>
 
-      <div className="flex-1 overflow-y-auto pt-4">
+      <div className="flex-1 pt-4 overflow-y-auto">
         <FilterEventList
           events={events}
           updateEventStatus={updateEventStatus}
